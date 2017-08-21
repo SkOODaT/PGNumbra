@@ -111,7 +111,7 @@ def save_account_info(acc):
     write_line_to_file(ACC_INFO_FILE, line)
 
     if mrmime_pgpool_enabled():
-        acc.update_pgpool()
+        acc.update_pgpool(release=True)
 
 
 def init_account_info_file(torches):
@@ -160,46 +160,9 @@ def log_results(key):
     if acc_stats[key]:
         log.info("{:7}: {}".format(key.upper(), acc_stats[key]))
 
-
-# Patch to make exceptions in threads cause an exception.
-def install_thread_excepthook():
-    """
-    Workaround for sys.excepthook thread bug
-    (https://sourceforge.net/tracker/?func=detail&atid=105470&aid=1230540&group_id=5470).
-    Call once from __main__ before creating any threads.
-    If using psyco, call psycho.cannotcompile(threading.Thread.run)
-    since this replaces a new-style class method.
-    """
-    import sys
-    run_old = Thread.run
-
-    def run(*args, **kwargs):
-        try:
-            run_old(*args, **kwargs)
-        except (KeyboardInterrupt, SystemExit):
-            raise
-        except:
-            sys.excepthook(*sys.exc_info())
-
-    Thread.run = run
-
-
-# Exception handler will log unhandled exceptions.
-def handle_exception(exc_type, exc_value, exc_traceback):
-    if issubclass(exc_type, KeyboardInterrupt):
-        sys.__excepthook__(exc_type, exc_value, exc_traceback)
-        return
-
-    log.error("Uncaught exception", exc_info=(
-        exc_type, exc_value, exc_traceback))
-
-
 # ===========================================================================
 
 log.info("PGNumbra ShadowCheck starting up.")
-
-install_thread_excepthook()
-sys.excepthook = handle_exception
 
 init_mr_mime(user_cfg={
     'pgpool_auto_update': False
@@ -238,7 +201,7 @@ init_account_info_file(torches)
 num_threads = cfg_get('shadowcheck_threads')
 log.info("Checking {} accounts with {} threads.".format(len(torches), num_threads))
 pool = ThreadPool(num_threads)
-pool.map(check_account, torches)
+pool.map_async(check_account, torches).get(sys.maxint)
 pool.close()
 pool.join()
 
