@@ -33,10 +33,9 @@ class SingleLocationScanner(POGOAccount):
 
     def scan_once(self):
         if self.check_login():
-            rareless_before = self.rareless_scans
+            rareless_before = self.rareless_scans or 0
             self.scan_location()
-            if self.rareless_scans > rareless_before:
-                self.shadowbanned = True
+            self.shadowbanned = self.rareless_scans > rareless_before
 
     def scan_location(self):
         tries = 0
