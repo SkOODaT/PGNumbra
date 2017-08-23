@@ -24,6 +24,11 @@ class SingleLocationScanner(POGOAccount):
         # The currently seen Pokemon
         self.seen_pokemon = {}
 
+    def close(self):
+        self._api._session.close()
+        self._api.get_auth_provider()._session.close()
+        del self._api
+
     def run(self):
         # Initial random delay to spread logins.
         time.sleep(random.randint(0, 10))

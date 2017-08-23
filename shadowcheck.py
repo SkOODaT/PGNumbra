@@ -45,30 +45,35 @@ def remove_account_file(suffix):
 
 def check_account(torch):
     try:
-        torch.scan_once()
-    except Exception as e:
-        log.exception("Error checking account {}".format(torch.username))
+        try:
+            torch.scan_once()
+        except Exception as e:
+            log.exception("Error checking account {}: {}".format(torch.username, repr(e)))
 
-    try:
-        if torch.seen_pokemon:
-            if is_blind(torch):
-                log.info("Account {} is shadowbanned. :-(".format(torch.username))
-                save_to_file(torch, 'blind')
+        try:
+            if torch.seen_pokemon:
+                if is_blind(torch):
+                    log.info("Account {} is shadowbanned. :-(".format(torch.username))
+                    save_to_file(torch, 'blind')
+                else:
+                    log.info("Account {} is good. :-)".format(torch.username))
+                    save_to_file(torch, 'good')
             else:
-                log.info("Account {} is good. :-)".format(torch.username))
-                save_to_file(torch, 'good')
-        else:
-            if torch.is_banned():
-                save_to_file(torch, 'banned')
-            elif torch.has_captcha():
-                save_to_file(torch, 'captcha')
-            else:
-                save_to_file(torch, 'error')
-        save_account_info(torch)
-    except Exception as e:
-        log.exception(
-            "Error saving checked account {} to file".format(torch.username))
-    del torch
+                if torch.is_banned():
+                    save_to_file(torch, 'banned')
+                elif torch.has_captcha():
+                    save_to_file(torch, 'captcha')
+                else:
+                    save_to_file(torch, 'error')
+            save_account_info(torch)
+        except Exception as e:
+            log.exception(
+                "Error saving checked account {} to file: {}".format(torch.username, repr(e)))
+    finally:
+        if mrmime_pgpool_enabled():
+            torch.update_pgpool(release=True)
+        torch.close()
+        del torch
 
 
 def write_line_to_file(fname, line):
@@ -109,9 +114,6 @@ def save_account_info(acc):
         km_walked_str
     )
     write_line_to_file(ACC_INFO_FILE, line)
-
-    if mrmime_pgpool_enabled():
-        acc.update_pgpool(release=True)
 
 
 def init_account_info_file(torches):
