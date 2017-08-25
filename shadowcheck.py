@@ -3,15 +3,16 @@ import os
 import sys
 from Queue import Queue
 from multiprocessing.pool import ThreadPool
-from threading import Lock, Thread
+from threading import Lock
 
-from mrmime import init_mr_mime, mrmime_pgpool_enabled
+from mrmime import mrmime_pgpool_enabled
 
 from pgnumbra.SingleLocationScanner import SingleLocationScanner
-from pgnumbra.config import cfg_get, cfg_set
+from pgnumbra.config import cfg_get, cfg_init
 from pgnumbra.proxy import init_proxies, get_new_proxy
 
 # ===========================================================================
+from pgnumbra.utils import load_accounts
 
 logging.basicConfig(level=logging.INFO,
     format='%(asctime)s [%(threadName)16s][%(module)14s][%(levelname)8s] %(message)s')
@@ -71,7 +72,7 @@ def check_account(torch):
                 "Error saving checked account {} to file: {}".format(torch.username, repr(e)))
     finally:
         if mrmime_pgpool_enabled():
-            torch.update_pgpool(release=True)
+            torch.update_pgpool(release=True, reason="Checked with PGNumbra")
         torch.close()
         del torch
 
@@ -164,11 +165,9 @@ def log_results(key):
 
 # ===========================================================================
 
-log.info("PGNumbra ShadowCheck starting up.")
+cfg_init(shadowcheck=True)
 
-init_mr_mime(user_cfg={
-    'pgpool_auto_update': False
-})
+log.info("PGNumbra ShadowCheck starting up.")
 
 lat = cfg_get('latitude')
 lng = cfg_get('longitude')
@@ -185,22 +184,12 @@ if os.path.isfile(ACC_INFO_FILE):
 
 init_proxies()
 
-# This test must include nearby Pokemon to work properly.
-cfg_set('include_nearby', True)
-
-torches = []
+torches = load_accounts()
 check_queue = Queue()
-with open(cfg_get('accounts_file'), 'r') as f:
-    for num, line in enumerate(f, 1):
-        fields = line.split(",")
-        fields = map(str.strip, fields)
-        torches.append(
-            SingleLocationScanner(fields[0], fields[1], fields[2], lat, lng,
-                                  cfg_get('hash_key'), get_new_proxy()))
 
 init_account_info_file(torches)
 
-num_threads = cfg_get('shadowcheck_threads')
+num_threads = cfg_get('threads')
 log.info("Checking {} accounts with {} threads.".format(len(torches), num_threads))
 pool = ThreadPool(num_threads)
 pool.map_async(check_account, torches).get(sys.maxint)

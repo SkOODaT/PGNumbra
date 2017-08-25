@@ -1,0 +1,34 @@
+# Required Settings
+###################
+
+#latitude:                              # Latitude of search location
+#longitude:                             # Longitude of search location
+#hash-key:                              # Bossland/GoMan hash key
+
+
+# Accounts
+##########
+
+#accounts-file: accounts.csv            # Load accounts from CSV file containing "auth_service,username,passwd" lines.
+#pgpool-url: http://localhost:4242      # Address of PGPool to load accounts from and/or update their details.
+#pgpool-num-accounts:                   # Load this many bad or new accounts from PGPool. pgpool-url required.
+
+
+# General Settings
+##################
+
+#proxies-file:                          # Load proxy list from text file (one proxy per line).
+#scan-retries: 3                        # Number of retries when scanning a location.
+
+
+# Settings related to compare_scans.py
+######################################
+
+#include-nearby: false                  # Include nearby Pokemon in compare_scans.py - always true for shadowcheck.py.
+#pokemon-format: full                   # Format of Pokemons in compare_scans.py table overview. One of 'id', 'short' or 'full'.
+
+
+# Settings related to shadowcheck.py
+####################################
+
+#threads: 4                             # Number of parallel threads to check accounts with shadowcheck.py.

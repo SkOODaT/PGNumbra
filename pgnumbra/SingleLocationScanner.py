@@ -3,7 +3,6 @@ import random
 import time
 
 from mrmime.pogoaccount import POGOAccount
-from pgoapi.utilities import get_cell_ids, f2i
 
 from pgnumbra.config import cfg_get
 

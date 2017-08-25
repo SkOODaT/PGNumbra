@@ -2,10 +2,8 @@ import logging
 import time
 from threading import Thread
 
-from mrmime import init_mr_mime
-
 from pgnumbra.SingleLocationScanner import SingleLocationScanner
-from pgnumbra.config import cfg_get
+from pgnumbra.config import cfg_get, cfg_init
 from pgnumbra.console import print_status
 from pgnumbra.proxy import init_proxies, get_new_proxy
 
@@ -23,7 +21,7 @@ scanners = []
 
 log.info("PGNumbra CompareScans starting up.")
 
-init_mr_mime()
+cfg_init()
 
 lat = cfg_get('latitude')
 lng = cfg_get('longitude')
