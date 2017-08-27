@@ -1,4 +1,4 @@
-git+https://github.com/sLoPPydrive/pgoapi-seb.git@d22fec3#egg=pgoapi
+git+https://github.com/sebastienvercammen/pgoapi.git@e8bb81e780bc6c245ab0de43426b2643962e8c61#egg=pgoapi
 git+https://github.com/sLoPPydrive/MrMime.git#egg=MrMime
 requests
 geopy
