@@ -10,9 +10,9 @@ log = logging.getLogger(__name__)
 
 
 class SingleLocationScanner(POGOAccount):
-    def __init__(self, auth, username, password, latitude, longitude, hash_key, proxy):
+    def __init__(self, auth, username, password, latitude, longitude, hash_key_provider, proxy):
         super(SingleLocationScanner, self).__init__(auth, username, password,
-                                                    hash_key=hash_key,
+                                                    hash_key_provider=hash_key_provider,
                                                     proxy_url=proxy)
 
         # Init API location

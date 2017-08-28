@@ -4,6 +4,7 @@ import sys
 
 import configargparse
 from mrmime import init_mr_mime
+from mrmime.cyclicresourceprovider import CyclicResourceProvider
 
 log = logging.getLogger(__name__)
 args = None
@@ -32,28 +33,28 @@ def parse_args():
                         is_config_file=True, help='Specify configuration file.')
 
     parser.add_argument('-lat', '--latitude', type=float, required=True,
-                        help=('Latitude of location to scan.'))
+                        help='Latitude of location to scan.')
 
     parser.add_argument('-lng', '--longitude', type=float, required=True,
-                        help=('Longitude of location to scan.'))
+                        help='Longitude of location to scan.')
 
-    parser.add_argument('-hk', '--hash-key', required=True,
-                        help=('Hash key to use.'))
+    parser.add_argument('-hk', '--hash-key', required=True, action='append',
+                        help='Hash key to use.')
 
     parser.add_argument('-p', '--proxies-file',
-                        help=('Load proxy list from text file (one proxy per line).'))
+                        help='Load proxy list from text file (one proxy per line).')
 
     parser.add_argument('-r', '--scan-retries', type=int, default=3,
-                        help=('Number of retries when scanning a location.'))
+                        help='Number of retries when scanning a location.')
 
     parser.add_argument('-n', '--include-nearby', action='store_true', default=False,
-                        help=("Include nearby Pokemon in compare_scans.py - always true for shadowcheck.py."))
+                        help="Include nearby Pokemon in compare_scans.py - always true for shadowcheck.py.")
 
     parser.add_argument('-f', '--pokemon-format', choices=['id', 'short', 'full'], default='full',
-                        help=("Format of Pokemons in compare_scans.py table overview."))
+                        help="Format of Pokemons in compare_scans.py table overview.")
 
     parser.add_argument('-t', '--threads', type=int, default=4,
-                        help=("Number of parallel threads to check accounts with shadowcheck.py."))
+                        help="Number of parallel threads to check accounts with shadowcheck.py.")
 
     parser.add_argument('-pgpu', '--pgpool-url',
                         help='Address of PGPool to load accounts from and/or update their details.')
@@ -66,6 +67,11 @@ def parse_args():
                       help='Load accounts from CSV file containing "auth_service,username,passwd" lines.')
 
     args = parser.parse_args()
+
+    # Provide hash keys
+    args.hash_key_provider = CyclicResourceProvider()
+    for hk in args.hash_key:
+        args.hash_key_provider.add_resource(hk)
 
 
 def get_pgpool_system_id():

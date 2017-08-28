@@ -45,7 +45,7 @@ def load_accounts():
                 fields = map(str.strip, fields)
                 accounts.append(
                     SingleLocationScanner(fields[0], fields[1], fields[2], cfg_get('latitude'), cfg_get('longitude'),
-                                          cfg_get('hash_key'), get_new_proxy()))
+                                          cfg_get('hash_key_provider'), get_new_proxy()))
     elif cfg_get('pgpool_url') and cfg_get('pgpool_num_accounts') > 0:
         log.info("Trying to load {} accounts from PGPool.".format(cfg_get('pgpool_num_accounts')))
         request = {
@@ -65,7 +65,7 @@ def load_accounts():
             for acc in acc_json:
                 accounts.append(
                     SingleLocationScanner(acc['auth_service'], acc['username'], acc['password'], cfg_get('latitude'),
-                                          cfg_get('longitude'), cfg_get('hash_key'), get_new_proxy()))
+                                          cfg_get('longitude'), cfg_get('hash_key_provider'), get_new_proxy()))
 
     if len(accounts) == 0:
         log.error("Could not load any accounts. Nothing to do. Exiting.")

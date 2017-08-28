@@ -44,37 +44,37 @@ def remove_account_file(suffix):
         os.remove(fname)
 
 
-def check_account(torch):
+def check_account(acc):
     try:
         try:
-            torch.scan_once()
+            acc.scan_once()
         except Exception as e:
-            log.exception("Error checking account {}: {}".format(torch.username, repr(e)))
+            log.exception("Error checking account {}: {}".format(acc.username, repr(e)))
 
         try:
-            if torch.seen_pokemon:
-                if is_blind(torch):
-                    log.info("Account {} is shadowbanned. :-(".format(torch.username))
-                    save_to_file(torch, 'blind')
+            if acc.seen_pokemon:
+                if is_blind(acc):
+                    log.info("Account {} is shadowbanned. :-(".format(acc.username))
+                    save_to_file(acc, 'blind')
                 else:
-                    log.info("Account {} is good. :-)".format(torch.username))
-                    save_to_file(torch, 'good')
+                    log.info("Account {} is good. :-)".format(acc.username))
+                    save_to_file(acc, 'good')
             else:
-                if torch.is_banned():
-                    save_to_file(torch, 'banned')
-                elif torch.has_captcha():
-                    save_to_file(torch, 'captcha')
+                if acc.is_banned():
+                    save_to_file(acc, 'banned')
+                elif acc.has_captcha():
+                    save_to_file(acc, 'captcha')
                 else:
-                    save_to_file(torch, 'error')
-            save_account_info(torch)
+                    save_to_file(acc, 'error')
+            save_account_info(acc)
         except Exception as e:
             log.exception(
-                "Error saving checked account {} to file: {}".format(torch.username, repr(e)))
+                "Error saving checked account {} to file: {}".format(acc.username, repr(e)))
     finally:
         if mrmime_pgpool_enabled():
-            torch.update_pgpool(release=True, reason="Checked with PGNumbra")
-        torch.close()
-        del torch
+            acc.update_pgpool(release=True, reason="Checked with PGNumbra")
+        acc.close()
+        del acc
 
 
 def write_line_to_file(fname, line):
@@ -117,11 +117,11 @@ def save_account_info(acc):
     write_line_to_file(ACC_INFO_FILE, line)
 
 
-def init_account_info_file(torches):
+def init_account_info_file(accounts):
     global acc_info_tmpl
 
     max_username_len = 4
-    for t in torches:
+    for t in accounts:
         max_username_len = max(max_username_len, len(t.username))
     acc_info_tmpl = '{:' + str(
         max_username_len) + '} | {:4} | {:3} | {:4} | {:7} | {:5} | {:3} | {:8} | {:6} | {:5} | {:5} | {:5} | {:10}\n'
@@ -143,20 +143,20 @@ def init_account_info_file(torches):
     write_line_to_file(ACC_INFO_FILE, line)
 
 
-def save_to_file(torch, suffix):
+def save_to_file(acc, suffix):
     global acc_stats
     acc_stats[suffix] = acc_stats.get(suffix, 0) + 1
     fname = "{}-{}.csv".format(FILE_PREFIX, suffix)
-    line = '{},{},{}\n'.format(torch.auth_service, torch.username, torch.password)
+    line = '{},{},{}\n'.format(acc.auth_service, acc.username, acc.password)
     write_line_to_file(fname, line)
 
 
-def is_blind(torch):
+def is_blind(acc):
     # We don't know if we did not search/find ANY Pokemon
-    if not torch.seen_pokemon:
+    if not acc.seen_pokemon:
         return None
 
-    return torch.rareless_scans != 0
+    return acc.rareless_scans != 0
 
 
 def log_results(key):
@@ -184,19 +184,18 @@ if os.path.isfile(ACC_INFO_FILE):
 
 init_proxies()
 
-torches = load_accounts()
-check_queue = Queue()
+accounts = load_accounts()
 
-init_account_info_file(torches)
+init_account_info_file(accounts)
 
 num_threads = cfg_get('threads')
-log.info("Checking {} accounts with {} threads.".format(len(torches), num_threads))
+log.info("Checking {} accounts with {} threads.".format(len(accounts), num_threads))
 pool = ThreadPool(num_threads)
-pool.map_async(check_account, torches).get(sys.maxint)
+pool.map_async(check_account, accounts).get(sys.maxint)
 pool.close()
 pool.join()
 
-log.info("All {} accounts processed.".format(len(torches)))
+log.info("All {} accounts processed.".format(len(accounts)))
 log_results('good')
 log_results('blind')
 log_results('captcha')

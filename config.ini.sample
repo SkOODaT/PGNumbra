@@ -3,7 +3,7 @@
 
 #latitude:                              # Latitude of search location
 #longitude:                             # Longitude of search location
-#hash-key:                              # Bossland/GoMan hash key
+#hash-key: [key1, key2]					# Bossland/GoMan hash key(s)
 
 
 # Accounts
