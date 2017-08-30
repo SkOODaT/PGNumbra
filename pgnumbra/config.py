@@ -68,11 +68,6 @@ def parse_args():
 
     args = parser.parse_args()
 
-    # Provide hash keys
-    args.hash_key_provider = CyclicResourceProvider()
-    for hk in args.hash_key:
-        args.hash_key_provider.add_resource(hk)
-
 
 def get_pgpool_system_id():
     return 'pgnumbra_' + str(os.getpid())
@@ -82,6 +77,11 @@ def cfg_init(shadowcheck=False):
     log.info("Loading PGNumbra configuration.")
 
     parse_args()
+
+    # Provide hash keys
+    args.hash_key_provider = CyclicResourceProvider()
+    for hk in args.hash_key:
+        args.hash_key_provider.add_resource(hk)
 
     mrmime_cfg = {
         'pgpool_system_id': get_pgpool_system_id()
