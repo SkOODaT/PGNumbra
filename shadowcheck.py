@@ -71,9 +71,7 @@ def check_account(acc):
             log.exception(
                 "Error saving checked account {} to file: {}".format(acc.username, repr(e)))
     finally:
-        if mrmime_pgpool_enabled():
-            acc.update_pgpool(release=True, reason="Checked with PGNumbra")
-        acc.close()
+        acc.release(reason="Checked with PGNumbra")
         del acc
 
 
