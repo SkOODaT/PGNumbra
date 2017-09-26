@@ -1,5 +1,5 @@
-git+https://github.com/michikrug/pgoapi.git@c1b940d71de5a80dcd83a58a136f42239d597862#egg=pgoapi
-git+https://github.com/sLoPPydrive/MrMime.git@0_73_1_RISKY#egg=MrMime
+git+https://github.com/michikrug/pgoapi.git@b17b28d#egg=pgoapi
+git+https://github.com/sLoPPydrive/MrMime.git#egg=MrMime
 requests
 geopy
 configargparse
