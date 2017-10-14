@@ -1,16 +1,11 @@
 import logging
 import os
 import sys
-from Queue import Queue
 from multiprocessing.pool import ThreadPool
 from threading import Lock
 
-from mrmime import mrmime_pgpool_enabled
-
-from pgnumbra.SingleLocationScanner import SingleLocationScanner
 from pgnumbra.config import cfg_get, cfg_init
-from pgnumbra.proxy import init_proxies, get_new_proxy
-
+from pgnumbra.proxy import init_proxies
 # ===========================================================================
 from pgnumbra.utils import load_accounts
 
