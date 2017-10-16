@@ -2,7 +2,7 @@
 Tools that help in identifying and analyzing shadowbanned POGO accounts.
 
 # Support the Author [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/slop)
-If you like PGNumbra Tools and feel the urgent need to thank me, just drop me one or more **level 30 accounts** or buy me a **[PokeHash key](https://talk.pogodev.org/d/51-api-hashing-service-by-pokefarmer)**. Seriously, that would be so awesome! :-D You can find me on various Pokémon related Discords as "sLoPPydrive".
+If you like PGNumbra Tools and feel the urgent need to **thank** me, the best way to do it is via **[PayPal](https://www.paypal.me/slop)** or **[BitCoin](bitcoin:1PNdXhzvvz2ytCf8mbFdF9MQaABzpjSbJi?label=Pok%C3%A9mon%20GO%20development) (_1PNdXhzvvz2ytCf8mbFdF9MQaABzpjSbJi_)**  Seriously, that would be so awesome! :-D If you can't or don't want to use PayPal some **level 30+** accounts or **[PokeHash keys](https://talk.pogodev.org/d/51-api-hashing-service-by-pokefarmer)** are always welcome as well. You can find me on various Pokémon related Discords as "sLoPPydrive".
 
 # Disclaimer
 PGNumbra Tools or its author takes no responsibility if your accounts get banned in any way. As with any other 3rd party software breaking the ToS there is absolutely no guarantee that your accounts stay safe. This software is purely for educational purpose.
@@ -70,6 +70,12 @@ optional arguments:
                         true for shadowcheck.py.
   -f {id,short,full}, --pokemon-format {id,short,full}
                         Format of Pokemons in compare_scans.py table overview.
+  -s SPIN_BELOW_LEVEL, --spin-below-level SPIN_BELOW_LEVEL
+                        shadowcheck.py: Spin Pokestops in range for accounts
+                        below this level.
+  -m MAX_SPINS, --max-spins MAX_SPINS
+                        shadowcheck.py: Spin at most this many Pokestops per
+                        account.
   -t THREADS, --threads THREADS
                         Number of parallel threads to check accounts with
                         shadowcheck.py.
@@ -91,7 +97,7 @@ There are basically 2 use cases for PGPool with PGNumbra:
 1. Updating account details to PGPool as you use or check them. Accounts themselves will be read from a CSV file.
 2. Requesting accounts from PGPool to check them for bans/shadowbans.
 
-For both you will need to set the `--pgpool-url` to point to a running PGPool instance. For 2. you will also need to specify the number of accounts to request from PGPool via `--pgpool-num-accounts`.
-In this case you must not specify a CSV file via `--accounts-file`. The accounts being requested from PGPool are currently not in use and either **new** and have unkonwn ban/shadowban status or they are **unusable** ()being banned or shadowbanned).
+For both you will need to set the `--pgpool-url` to point to a running PGPool instance. For use case 2 you will also need to specify the number of accounts to request from PGPool via `--pgpool-num-accounts`.
+In this case you must not specify a CSV file via `--accounts-file`. The accounts being requested from PGPool are currently not in use and either **new** and have unkonwn ban/shadowban status or they are **unusable** (being banned or shadowbanned).
 
 Because you don't have fine-grained control over which accounts get requested from PGPool you will usually only use it with `shadowcheck.py`. For `compare_scans.py` it is better to provide an `--accounts-file`.

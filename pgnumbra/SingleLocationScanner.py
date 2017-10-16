@@ -31,10 +31,13 @@ class SingleLocationScanner(POGOAccount):
             time.sleep(15)
 
     def scan_once(self):
+        response = None
         if self.check_login():
             rareless_before = self.rareless_scans or 0
-            self.scan_location()
+            response = self.scan_location()
             self.shadowbanned = self.rareless_scans > rareless_before
+
+        return response
 
     def scan_location(self):
         tries = 0
@@ -49,7 +52,7 @@ class SingleLocationScanner(POGOAccount):
                 self.count_pokemon(responses)
                 if self.seen_pokemon:
                     self.log_info("Successfully scanned location")
-                    return
+                    return responses
                 else:
                     self.log_warning("Emtpy scan (try #{})".format(tries))
             except Exception as e:
@@ -58,6 +61,7 @@ class SingleLocationScanner(POGOAccount):
                                                                     repr(e)))
 
         self.log_error("Failed {} times. Giving up.".format(max_tries))
+        return None
 
     def count_pokemon(self, response):
         self.seen_pokemon = {}

@@ -53,6 +53,12 @@ def parse_args():
     parser.add_argument('-f', '--pokemon-format', choices=['id', 'short', 'full'], default='full',
                         help="Format of Pokemons in compare_scans.py table overview.")
 
+    parser.add_argument('-s', '--spin-below-level', type=int, default=2,
+                        help="shadowcheck.py: Spin Pokestops in range for accounts below this level.")
+
+    parser.add_argument('-m', '--max-spins', type=int, default=1,
+                        help="shadowcheck.py: Spin at most this many Pokestops per account.")
+
     parser.add_argument('-t', '--threads', type=int, default=4,
                         help="Number of parallel threads to check accounts with shadowcheck.py.")
 

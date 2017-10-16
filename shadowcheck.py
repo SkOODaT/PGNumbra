@@ -4,9 +4,12 @@ import sys
 from multiprocessing.pool import ThreadPool
 from threading import Lock
 
+from mrmime.utils import get_spinnable_pokestops
+
 from pgnumbra.config import cfg_get, cfg_init
 from pgnumbra.proxy import init_proxies
 # ===========================================================================
+from pgnumbra.spin import spin_pokestop
 from pgnumbra.utils import load_accounts
 
 logging.basicConfig(level=logging.INFO,
@@ -42,7 +45,26 @@ def remove_account_file(suffix):
 def check_account(acc):
     try:
         try:
-            acc.scan_once()
+            response = acc.scan_once()
+
+            lvl = acc.get_stats('level')
+            if response:
+                spin_below_level = cfg_get("spin_below_level")
+                max_spins = cfg_get("max_spins")
+                if lvl < spin_below_level:
+                    step_location = (acc.latitude, acc.longitude)
+                    stops = get_spinnable_pokestops(response, step_location)
+                    acc.log_info("Account is level {}. Trying to spin {} Pokestop(s) for XP.".format(lvl, min(max_spins,
+                                                                                                              len(stops))))
+                    spins = 0
+                    for stop in stops:
+                        if spin_pokestop(acc, stop, step_location):
+                            spins += 1
+                        if spins >= max_spins:
+                            break
+                else:
+                    acc.log_info(
+                        "Account is at least level {}. Not spinning any Pokestop.".format(spin_below_level))
         except Exception as e:
             log.exception("Error checking account {}: {}".format(acc.username, repr(e)))
 

@@ -32,3 +32,5 @@
 ####################################
 
 #threads: 4                             # Number of parallel threads to check accounts with shadowcheck.py.
+#spin-below-level: 2                    # Spin Pokestops in range for accounts below this level.
+#max-spins: 1                           # Spin at most this many Pokestops per account.
