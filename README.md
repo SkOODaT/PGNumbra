@@ -2,7 +2,10 @@
 Tools that help in identifying and analyzing shadowbanned POGO accounts.
 
 # Support the Author [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.me/slop)
-If you like PGNumbra Tools and feel the urgent need to **thank** me, the best way to do it is via **[PayPal](https://www.paypal.me/slop)** or **[BitCoin](bitcoin:1PNdXhzvvz2ytCf8mbFdF9MQaABzpjSbJi?label=Pok%C3%A9mon%20GO%20development) (_1PNdXhzvvz2ytCf8mbFdF9MQaABzpjSbJi_)**  Seriously, that would be so awesome! :-D If you can't or don't want to use PayPal some **level 30+** accounts or **[PokeHash keys](https://talk.pogodev.org/d/51-api-hashing-service-by-pokefarmer)** are always welcome as well. You can find me on various Pokémon related Discords as "sLoPPydrive".
+If you like PGNumbra Tools and feel the urgent need to **thank** me, the best way to do it is via **[PayPal](https://www.paypal.me/slop)** or **BitCoin (_1PNdXhzvvz2ytCf8mbFdF9MQaABzpjSbJi_)**  Seriously, that would be so awesome! :-D If you can't or don't want to use PayPal some **level 30+** accounts or **[PokeHash keys](https://talk.pogodev.org/d/51-api-hashing-service-by-pokefarmer)** are always welcome as well. You can find me on various Pokémon related Discords as "sLoPPydrive".
+
+# Get Help
+Come join the official **[PGTools Discord Server](https://discord.gg/Vwe5mTa)** for [PGScout](https://github.com/sLoPPydrive/PGScout), [PGNumbra](https://github.com/sLoPPydrive/PGNumbra), [PGPool](https://github.com/sLoPPydrive/PGPool) and the PGTools [RocketMap](https://github.com/sLoPPydrive/RocketMap) and [PokeAlarm](https://github.com/sLoPPydrive/PokeAlarm) forks to get help or just hang around. You are very welcome. :)
 
 # Disclaimer
 PGNumbra Tools or its author takes no responsibility if your accounts get banned in any way. As with any other 3rd party software breaking the ToS there is absolutely no guarantee that your accounts stay safe. This software is purely for educational purpose.
