@@ -47,7 +47,7 @@ def parse_args():
     parser.add_argument('-r', '--scan-retries', type=int, default=3,
                         help='Number of retries when scanning a location.')
 
-    parser.add_argument('-n', '--include-nearby', action='store_true', default=False,
+    parser.add_argument('-i', '--include-nearby', action='store_true', default=False,
                         help="Include nearby Pokemon in compare_scans.py - always true for shadowcheck.py.")
 
     parser.add_argument('-f', '--pokemon-format', choices=['id', 'short', 'full'], default='full',

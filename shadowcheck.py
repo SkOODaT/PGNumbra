@@ -64,7 +64,7 @@ def check_account(acc):
                             break
                 else:
                     acc.log_info(
-                        "Account is at least level {}. Not spinning any Pokestop.".format(spin_below_level))
+                        "Account already reached level {}. Not spinning any Pokestop.".format(spin_below_level))
         except Exception as e:
             log.exception("Error checking account {}: {}".format(acc.username, repr(e)))
 
@@ -183,9 +183,6 @@ def log_results(key):
 cfg_init(shadowcheck=True)
 
 log.info("PGNumbra ShadowCheck starting up.")
-
-lat = cfg_get('latitude')
-lng = cfg_get('longitude')
 
 # Delete result files.
 remove_account_file('good')

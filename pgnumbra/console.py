@@ -24,7 +24,7 @@ def input_processor(state):
             os._exit(0)
 
 
-def print_status(scanners, dummy):
+def print_status(scanners):
     state = {
         'page': 1
     }

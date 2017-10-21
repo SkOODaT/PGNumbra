@@ -6,6 +6,7 @@ from pgnumbra.SingleLocationScanner import SingleLocationScanner
 from pgnumbra.config import cfg_get, cfg_init
 from pgnumbra.console import print_status
 from pgnumbra.proxy import init_proxies, get_new_proxy
+from pgnumbra.utils import load_accounts
 
 logging.basicConfig(filename="compare_scans.log", level=logging.INFO,
     format='%(asctime)s [%(threadName)16s][%(module)14s][%(levelname)8s] %(message)s')
@@ -28,21 +29,16 @@ lng = cfg_get('longitude')
 
 init_proxies()
 
-with open(cfg_get('accounts_file'), 'r') as f:
-    for num, line in enumerate(f, 1):
-        fields = line.split(",")
-        fields = map(str.strip, fields)
-        scanner = SingleLocationScanner(fields[0], fields[1], fields[2], lat,
-                                        lng, cfg_get('hash_key'),
-                                        get_new_proxy())
-        scanners.append(scanner)
-        t = Thread(target=scanner.run)
-        t.daemon = True
-        t.start()
+accounts = load_accounts()
+
+for acc in accounts:
+    t = Thread(target=acc.run)
+    t.daemon = True
+    t.start()
 
 # Start thread to print current status and get user input.
 t = Thread(target=print_status,
-           name='status_printer', args=(scanners, "dummy"))
+           name='status_printer', args=(accounts,))
 t.daemon = True
 t.start()
 
