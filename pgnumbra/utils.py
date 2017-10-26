@@ -41,10 +41,24 @@ def load_accounts():
         log.info("Loading accounts from file {}.".format(cfg_get('accounts_file')))
         with open(cfg_get('accounts_file'), 'r') as f:
             for num, line in enumerate(f, 1):
+                if str.strip(line) == "":
+                    continue
                 fields = line.split(",")
-                fields = map(str.strip, fields)
+                if len(fields) == 3:
+                    auth = str.strip(fields[0])
+                    usr = str.strip(fields[1])
+                    pwd = str.strip(fields[2])
+                elif len(fields) == 2:
+                    auth = 'ptc'
+                    usr = str.strip(fields[0])
+                    pwd = str.strip(fields[1])
+                elif len(fields) == 1:
+                    fields = line.split(":")
+                    auth = 'ptc'
+                    usr = str.strip(fields[0])
+                    pwd = str.strip(fields[1])
                 accounts.append(
-                    SingleLocationScanner(fields[0], fields[1], fields[2], cfg_get('latitude'), cfg_get('longitude'),
+                    SingleLocationScanner(auth, usr, pwd, cfg_get('latitude'), cfg_get('longitude'),
                                           cfg_get('hash_key_provider'), get_new_proxy()))
     elif cfg_get('pgpool_url') and cfg_get('pgpool_num_accounts') > 0:
         log.info("Trying to load {} accounts from PGPool.".format(cfg_get('pgpool_num_accounts')))
