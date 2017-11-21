@@ -5,9 +5,7 @@ import sys
 
 import requests
 
-from pgnumbra.SingleLocationScanner import SingleLocationScanner
 from pgnumbra.config import cfg_get, get_pgpool_system_id
-from pgnumbra.proxy import get_new_proxy
 
 log = logging.getLogger(__name__)
 
@@ -35,53 +33,49 @@ def shorten(s):
     return s[:3]
 
 
-def load_accounts():
+def load_accounts_file():
     accounts = []
-    if cfg_get('accounts_file'):
-        log.info("Loading accounts from file {}.".format(cfg_get('accounts_file')))
-        with open(cfg_get('accounts_file'), 'r') as f:
-            for num, line in enumerate(f, 1):
-                if str.strip(line) == "":
-                    continue
-                fields = line.split(",")
-                if len(fields) == 3:
-                    auth = str.strip(fields[0])
-                    usr = str.strip(fields[1])
-                    pwd = str.strip(fields[2])
-                elif len(fields) == 2:
-                    auth = 'ptc'
-                    usr = str.strip(fields[0])
-                    pwd = str.strip(fields[1])
-                elif len(fields) == 1:
-                    fields = line.split(":")
-                    auth = 'ptc'
-                    usr = str.strip(fields[0])
-                    pwd = str.strip(fields[1])
-                accounts.append(
-                    SingleLocationScanner(auth, usr, pwd, cfg_get('latitude'), cfg_get('longitude'),
-                                          cfg_get('hash_key_provider'), get_new_proxy()))
-    elif cfg_get('pgpool_url') and cfg_get('pgpool_num_accounts') > 0:
-        log.info("Trying to load {} accounts from PGPool.".format(cfg_get('pgpool_num_accounts')))
-        request = {
-            'system_id': get_pgpool_system_id(),
-            'count': cfg_get('pgpool_num_accounts'),
-            'banned_or_new': True
-        }
-
-        r = requests.get("{}/account/request".format(cfg_get('pgpool_url')), params=request)
-
-        acc_json = r.json()
-        if isinstance(acc_json, dict):
-            acc_json = [acc_json]
-
-        if len(acc_json) > 0:
-            log.info("Loaded {} accounts from PGPool.".format(len(acc_json)))
-            for acc in acc_json:
-                accounts.append(
-                    SingleLocationScanner(acc['auth_service'], acc['username'], acc['password'], cfg_get('latitude'),
-                                          cfg_get('longitude'), cfg_get('hash_key_provider'), get_new_proxy()))
-
+    log.info("Loading accounts from file {}.".format(cfg_get('accounts_file')))
+    with open(cfg_get('accounts_file'), 'r') as f:
+        for num, line in enumerate(f, 1):
+            if str.strip(line) == "":
+                continue
+            fields = line.split(",")
+            if len(fields) == 3:
+                auth = str.strip(fields[0])
+                usr = str.strip(fields[1])
+                pwd = str.strip(fields[2])
+            elif len(fields) == 2:
+                auth = 'ptc'
+                usr = str.strip(fields[0])
+                pwd = str.strip(fields[1])
+            elif len(fields) == 1:
+                fields = line.split(":")
+                auth = 'ptc'
+                usr = str.strip(fields[0])
+                pwd = str.strip(fields[1])
+            accounts.append({
+                'auth_service': auth,
+                'username': usr,
+                'password': pwd
+            })
     if len(accounts) == 0:
         log.error("Could not load any accounts. Nothing to do. Exiting.")
         sys.exit(1)
     return accounts
+
+
+def pgpool_load_accounts(num):
+    request = {
+        'system_id': get_pgpool_system_id(),
+        'count': num,
+        'banned_or_new': True
+    }
+
+    r = requests.get("{}/account/request".format(cfg_get('pgpool_url')), params=request)
+
+    acc_json = r.json()
+    if isinstance(acc_json, dict):
+        acc_json = [acc_json]
+
+    return acc_json

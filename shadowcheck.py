@@ -1,19 +1,20 @@
 import logging
 import os
 import sys
-from multiprocessing.pool import ThreadPool
-from threading import Lock
+from threading import Lock, Thread
 
 from mrmime.utils import get_spinnable_pokestops
 
+from pgnumbra.CSVAccProvider import CSVAccProvider
+from pgnumbra.PGPoolAccProvider import PGPoolAccProvider
+from pgnumbra.SingleLocationScanner import SingleLocationScanner
 from pgnumbra.config import cfg_get, cfg_init
-from pgnumbra.proxy import init_proxies
+from pgnumbra.proxy import init_proxies, get_new_proxy
 # ===========================================================================
 from pgnumbra.spin import spin_pokestop
-from pgnumbra.utils import load_accounts
 
 logging.basicConfig(level=logging.INFO,
-    format='%(asctime)s [%(threadName)16s][%(module)14s][%(levelname)8s] %(message)s')
+    format='%(asctime)s [%(threadName)16s][%(module)17s][%(levelname)8s] %(message)s')
 
 log = logging.getLogger(__name__)
 
@@ -33,6 +34,8 @@ acc_stats = {
     'error': 0
 }
 
+threads = []
+
 # ===========================================================================
 
 
@@ -40,6 +43,17 @@ def remove_account_file(suffix):
     fname = '{}-{}.csv'.format(FILE_PREFIX, suffix)
     if os.path.isfile(fname):
         os.remove(fname)
+
+
+def check_thread(account_provider):
+    while True:
+        acc = account_provider.next()
+        if acc:
+            check_account(
+                SingleLocationScanner(acc['auth_service'], acc['username'], acc['password'], cfg_get('latitude'),
+                                      cfg_get('longitude'), cfg_get('hash_key_provider'), get_new_proxy()))
+        else:
+            break
 
 
 def check_account(acc):
@@ -132,14 +146,10 @@ def save_account_info(acc):
     write_line_to_file(ACC_INFO_FILE, line)
 
 
-def init_account_info_file(accounts):
+def init_account_info_file():
     global acc_info_tmpl
 
-    max_username_len = 4
-    for t in accounts:
-        max_username_len = max(max_username_len, len(t.username))
-    acc_info_tmpl = '{:' + str(
-        max_username_len) + '} | {:4} | {:3} | {:4} | {:7} | {:5} | {:3} | {:8} | {:6} | {:5} | {:5} | {:5} | {:10}\n'
+    acc_info_tmpl = '{:20} | {:4} | {:3} | {:4} | {:7} | {:5} | {:3} | {:8} | {:6} | {:5} | {:5} | {:5} | {:10}\n'
     line = acc_info_tmpl.format(
         'Username',
         'Warn',
@@ -196,18 +206,30 @@ if os.path.isfile(ACC_INFO_FILE):
 
 init_proxies()
 
-accounts = load_accounts()
+if cfg_get('accounts_file'):
+    account_provider = CSVAccProvider()
+elif cfg_get('pgpool_url') and cfg_get('pgpool_num_accounts') > 0:
+    account_provider = PGPoolAccProvider()
+else:
+    log.error(
+        "No idea which accounts you want to check. Use either --accounts-file or --pgpool-url with --pgpool-num-accounts.")
+    sys.exit()
 
-init_account_info_file(accounts)
+init_account_info_file()
 
 num_threads = cfg_get('threads')
-log.info("Checking {} accounts with {} threads.".format(len(accounts), num_threads))
-pool = ThreadPool(num_threads)
-pool.map_async(check_account, accounts).get(sys.maxint)
-pool.close()
-pool.join()
+log.info("Checking {} accounts with {} threads.".format(account_provider.get_num_accounts(), num_threads))
+for i in range(0, num_threads):
+    t = Thread(target=check_thread, args=(account_provider,))
+    t.daemon = True
+    t.start()
+    threads.append(t)
 
-log.info("All {} accounts processed.".format(len(accounts)))
+# Wait for threads to end
+for t in threads:
+    t.join()
+
+log.info("All {} accounts processed.".format(account_provider.num_provided))
 log_results('good')
 log_results('blind')
 log_results('captcha')

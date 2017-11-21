@@ -3,10 +3,10 @@
 
 import logging
 import sys
+from Queue import Queue
 from threading import Thread
 
 import requests
-from queue import Queue
 
 from pgnumbra.config import cfg_get
 
