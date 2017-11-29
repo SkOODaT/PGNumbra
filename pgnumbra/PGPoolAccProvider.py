@@ -47,6 +47,8 @@ class PGPoolAccProvider(AccProvider):
 
                     if acc:
                         self.num_provided += 1
+                        if self.num_provided % 100 == 0:
+                            log.info("Provided {} accounts so far...".format(self.num_provided))
                         if self.num_provided >= cfg_get('pgpool_num_accounts'):
                             self.finish()
             return acc

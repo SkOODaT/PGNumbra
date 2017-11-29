@@ -30,6 +30,8 @@ class CSVAccProvider(AccProvider):
                 else:
                     acc = self.accounts[self.num_provided]
                     self.num_provided += 1
+                    if self.num_provided % 100 == 0:
+                        log.info("Provided {} accounts so far...".format(self.num_provided))
                     if self.num_provided >= len(self.accounts):
                         self.finish()
             return acc
@@ -38,5 +40,5 @@ class CSVAccProvider(AccProvider):
 
     def finish(self):
         self.done = True
-        log.info("Finished providing accounts. Provided {} of {} accounts in total.".format(self.num_provided, cfg_get(
-            'pgpool_num_accounts')))
+        log.info("Finished providing accounts. Provided {} of {} accounts in total.".format(self.num_provided,
+                                                                                            len(self.accounts)))
