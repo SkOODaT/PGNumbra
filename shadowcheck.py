@@ -1,3 +1,4 @@
+import codecs
 import logging
 import os
 import sys
@@ -111,7 +112,7 @@ def write_line_to_file(fname, line):
     if not hasattr(write_line_to_file, 'lock'):
         write_line_to_file.lock = Lock()
     write_line_to_file.lock.acquire()
-    with open(fname, 'a') as f:
+    with codecs.open(fname, mode='a', encoding='utf-8') as f:
         f.write(line)
         f.close()
     write_line_to_file.lock.release()
@@ -172,7 +173,7 @@ def save_to_file(acc, suffix):
     global acc_stats
     acc_stats[suffix] = acc_stats.get(suffix, 0) + 1
     fname = "{}-{}.csv".format(FILE_PREFIX, suffix)
-    line = '{},{},{}\n'.format(acc.auth_service, acc.username, acc.password)
+    line = u'{},{},{}\n'.format(acc.auth_service, acc.username, acc.password)
     write_line_to_file(fname, line)
 
 

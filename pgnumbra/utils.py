@@ -1,3 +1,4 @@
+import codecs
 import json
 import logging
 import os
@@ -36,24 +37,24 @@ def shorten(s):
 def load_accounts_file():
     accounts = []
     log.info("Loading accounts from file {}.".format(cfg_get('accounts_file')))
-    with open(cfg_get('accounts_file'), 'r') as f:
-        for num, line in enumerate(f, 1):
-            if str.strip(line) == "":
+    with codecs.open(cfg_get('accounts_file'), mode='r', encoding='utf-8') as f:
+        for line in f:
+            if line.strip() == "":
                 continue
             fields = line.split(",")
             if len(fields) == 3:
-                auth = str.strip(fields[0])
-                usr = str.strip(fields[1])
-                pwd = str.strip(fields[2])
+                auth = fields[0].strip()
+                usr = fields[1].strip()
+                pwd = fields[2].strip()
             elif len(fields) == 2:
                 auth = 'ptc'
-                usr = str.strip(fields[0])
-                pwd = str.strip(fields[1])
+                usr = fields[0].strip()
+                pwd = fields[1].strip()
             elif len(fields) == 1:
                 fields = line.split(":")
                 auth = 'ptc'
-                usr = str.strip(fields[0])
-                pwd = str.strip(fields[1])
+                usr = fields[0].strip()
+                pwd = fields[1].strip()
             accounts.append({
                 'auth_service': auth,
                 'username': usr,
