@@ -53,6 +53,10 @@ def check_thread(account_provider):
             check_account(
                 SingleLocationScanner(acc['auth_service'], acc['username'], acc['password'], cfg_get('latitude'),
                                       cfg_get('longitude'), cfg_get('hash_key_provider'), get_new_proxy()))
+            if cfg_get('max_good') and acc_stats['good'] >= cfg_get('max_good'):
+                if acc_stats['good'] == cfg_get('max_good'):
+                    log.info("Found {} GOOD accounts. Exiting.".format(acc_stats['good']))
+                break;
         else:
             break
 

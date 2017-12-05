@@ -62,8 +62,17 @@ def parse_args():
     parser.add_argument('-t', '--threads', type=int, default=4,
                         help="Number of parallel threads to check accounts with shadowcheck.py.")
 
+    parser.add_argument('-pgpmin', '--pgpool-min-level', type=int, default=1,
+                        help="Minimum trainer level to request from PGPool")
+
+    parser.add_argument('-pgpmax', '--pgpool-max-level', type=int, default=40,
+                        help="Maximum trainer level to request from PGPool")
+
     parser.add_argument('-pgpu', '--pgpool-url',
                         help='Address of PGPool to load accounts from and/or update their details.')
+
+    parser.add_argument('-mg', '--max-good', type=int, default=0,
+                        help="Stop checking after this many 'GOOD' accounts have been found.")
 
     accs = parser.add_mutually_exclusive_group(required=True)
     accs.add_argument('-pgpn', '--pgpool-num-accounts', type=int, default=0,
@@ -80,6 +89,8 @@ def get_pgpool_system_id():
 
 
 def cfg_init(shadowcheck=False):
+    global args
+
     log.info("Loading PGNumbra configuration.")
 
     parse_args()
@@ -101,5 +112,12 @@ def cfg_init(shadowcheck=False):
         # This test must include nearby Pokemon to work properly.
         args.include_nearby = True
         mrmime_cfg['pgpool_auto_update'] = False
+
+    if cfg_get('pgpool_min_level') > 1 or cfg_get('pgpool_max_level') < 40:
+        log.info("Only checking accounts with trainer level {} to {}.".format(cfg_get('pgpool_min_level'),
+                                                                              cfg_get('pgpool_max_level')))
+
+    if cfg_get('max_good'):
+        log.info("Stopping after {} GOOD accounts.".format(cfg_get('max_good')))
 
     init_mr_mime(user_cfg=mrmime_cfg)

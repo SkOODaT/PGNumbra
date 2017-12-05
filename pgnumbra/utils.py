@@ -5,6 +5,7 @@ import os
 import sys
 
 import requests
+import time
 
 from pgnumbra.config import cfg_get, get_pgpool_system_id
 
@@ -70,13 +71,24 @@ def pgpool_load_accounts(num):
     request = {
         'system_id': get_pgpool_system_id(),
         'count': num,
+        'min_level': cfg_get('pgpool_min_level'),
+        'max_level': cfg_get('pgpool_max_level'),
         'banned_or_new': True
     }
 
-    r = requests.get("{}/account/request".format(cfg_get('pgpool_url')), params=request)
+    while True:
+        try:
+            r = requests.get("{}/account/request".format(cfg_get('pgpool_url')), params=request)
+            if r.status_code == 200:
+                acc_json = r.json()
+                if isinstance(acc_json, dict):
+                    acc_json = [acc_json]
 
-    acc_json = r.json()
-    if isinstance(acc_json, dict):
-        acc_json = [acc_json]
+                return acc_json
+            else:
+                log.error("Could not request accounts from PGPool. Status {}: {} - Retrying...", r.status_code,
+                          repr(r.content))
+        except Exception as e:
+            log.error("Error requesting accounts from PGPool: {} - Retrying...", repr(e))
 
-    return acc_json
+        time.sleep(2)
